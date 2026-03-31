@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dalle Salgados - Controle</title>
+</head>
+<body style="font-family: Arial; padding:20px">
+
+  <h1>Dalle Salgados</h1>
+  <h3>Controle simples de produção</h3>
+
+  <h2>Estoque de produtos prontos</h2>
+  <input id="produto" placeholder="Produto">
+  <input id="quantidade" type="number" placeholder="Quantidade">
+  <button onclick="adicionar()">Adicionar</button>
+
+  <ul id="lista"></ul>
+
+  <script>
+    let estoque = JSON.parse(localStorage.getItem("estoque")) || [];
+
+    function salvar() {
+      localStorage.setItem("estoque", JSON.stringify(estoque));
+    }
+
+    function render() {
+      let lista = document.getElementById("lista");
+      lista.innerHTML = "";
+      estoque.forEach((item, index) => {
+        let li = document.createElement("li");
+        li.innerHTML = item.produto + " - " + item.quantidade + 
+        " <button onclick='remover(" + index + ")'>Vender</button>";
+        lista.appendChild(li);
+      });
+    }
+
+    function adicionar() {
+      let produto = document.getElementById("produto").value;
+      let quantidade = document.getElementById("quantidade").value;
+
+      estoque.push({ produto, quantidade });
+      salvar();
+      render();
+    }
+
+    function remover(index) {
+      estoque.splice(index, 1);
+      salvar();
+      render();
+    }
+
+    render();
+  </script>
+
+</body>
+</html>
