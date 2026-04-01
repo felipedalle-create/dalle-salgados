@@ -1,57 +1,937 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dalle Salgados - Controle</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dalle Salgados | Sistema Operacional</title>
+  <style>
+    :root{
+      --bg:#f5f6f8;
+      --card:#ffffff;
+      --text:#1f2328;
+      --muted:#69707d;
+      --border:#e5e7eb;
+      --black:#111111;
+      --orange:#f2a000;
+      --green:#16a34a;
+      --yellow:#f59e0b;
+      --red:#dc2626;
+      --blue:#2563eb;
+      --teal:#0f766e;
+      --shadow:0 8px 24px rgba(16,24,40,.08);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)
+    }
+    .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+    .sidebar{
+      background:#fff;border-right:1px solid var(--border);padding:20px;position:sticky;top:0;height:100vh;overflow:auto
+    }
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+    .brand-logo{
+      width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#111 0%,#111 62%,#f2a000 62%,#f2a000 100%);
+      display:grid;place-items:center;color:#fff;font-weight:700;box-shadow:var(--shadow)
+    }
+    .brand h1{margin:0;font-size:20px}
+    .brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+    .nav-btn{
+      width:100%;border:1px solid var(--border);background:#fff;border-radius:14px;padding:12px 14px;
+      text-align:left;margin-bottom:10px;cursor:pointer;font-weight:600
+    }
+    .nav-btn.active{background:#111;color:#fff;border-color:#111}
+    .main{padding:22px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+    .topbar .title h2{margin:0;font-size:28px}
+    .topbar .title p{margin:6px 0 0;color:var(--muted)}
+    .pill{background:#fff;border:1px solid var(--border);padding:10px 14px;border-radius:999px;font-size:14px}
+    .section{display:none}
+    .section.active{display:block}
+    .grid{display:grid;gap:16px}
+    .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .card{
+      background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)
+    }
+    .card h3,.card h4{margin:0 0 12px}
+    .kpi .label{font-size:14px;color:var(--muted)}
+    .kpi .value{font-size:30px;font-weight:800;margin-top:8px}
+    .muted{color:var(--muted)}
+    .badge{
+      display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;border:1px solid transparent
+    }
+    .b-green{background:#dcfce7;color:#166534;border-color:#bbf7d0}
+    .b-yellow{background:#fef3c7;color:#92400e;border-color:#fde68a}
+    .b-red{background:#fee2e2;color:#991b1b;border-color:#fecaca}
+    .b-blue{background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe}
+    .b-gray{background:#f3f4f6;color:#374151;border-color:#e5e7eb}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:left;font-size:14px;vertical-align:top}
+    th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+    .row-green{background:#f0fdf4}
+    .row-yellow{background:#fffbeb}
+    .row-red{background:#fef2f2}
+    .row-blue{background:#eff6ff}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-size:13px;font-weight:700}
+    input,select,textarea,button{
+      font:inherit
+    }
+    input,select,textarea{
+      width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:#fff
+    }
+    textarea{min-height:92px;resize:vertical}
+    .btn{
+      border:none;background:#111;color:#fff;padding:12px 16px;border-radius:12px;cursor:pointer;font-weight:700
+    }
+    .btn.secondary{background:#fff;color:#111;border:1px solid var(--border)}
+    .btn.orange{background:var(--orange);color:#111}
+    .btn.small{padding:8px 10px;font-size:13px;border-radius:10px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .list-item{
+      border:1px solid var(--border);border-radius:14px;padding:12px 14px;background:#fff
+    }
+    .list-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .logo-header{
+      display:flex;align-items:center;gap:14px
+    }
+    .logo-header img{
+      width:120px;max-width:100%;height:auto;object-fit:contain;background:#fff;border-radius:16px;padding:6px;border:1px solid var(--border)
+    }
+    .helper{font-size:12px;color:var(--muted)}
+    @media (max-width: 1100px){
+      .grid-4,.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media (max-width: 900px){
+      .app{grid-template-columns:1fr}
+      .sidebar{position:static;height:auto}
+      .grid-2,.grid-3,.grid-4,.form-grid{grid-template-columns:1fr}
+      .main{padding:14px}
+      .topbar .title h2{font-size:24px}
+      .logo-header{flex-direction:column;align-items:flex-start}
+    }
+  </style>
 </head>
-<body style="font-family: Arial; padding:20px">
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">D</div>
+      <div>
+        <h1>Dalle Salgados</h1>
+        <p>Sistema operacional</p>
+      </div>
+    </div>
 
-  <h1>Dalle Salgados</h1>
-  <h3>Controle simples de produção</h3>
+    <button class="nav-btn active" data-section="dashboard">📊 Dashboard</button>
+    <button class="nav-btn" data-section="vendas">💰 Vendas</button>
+    <button class="nav-btn" data-section="producao">🏭 Produção</button>
+    <button class="nav-btn" data-section="estoque">📦 Estoque</button>
+    <button class="nav-btn" data-section="compras">🛒 Compras</button>
+    <button class="nav-btn" data-section="recebimento">📥 Recebimento</button>
+    <button class="nav-btn" data-section="cadastro">⚙️ Cadastro</button>
 
-  <h2>Estoque de produtos prontos</h2>
-  <input id="produto" placeholder="Produto">
-  <input id="quantidade" type="number" placeholder="Quantidade">
-  <button onclick="adicionar()">Adicionar</button>
+    <div class="card" style="margin-top:18px">
+      <h4 style="margin-bottom:8px">Cores do estoque</h4>
+      <div class="list">
+        <div><span class="badge b-green">Verde</span> Estoque confortável</div>
+        <div><span class="badge b-yellow">Amarelo</span> Atenção</div>
+        <div><span class="badge b-red">Vermelho</span> Perto de acabar</div>
+        <div><span class="badge b-blue">Azul</span> Divergência / erro</div>
+      </div>
+    </div>
+  </aside>
 
-  <ul id="lista"></ul>
+  <main class="main">
+    <div class="topbar">
+      <div class="logo-header">
+        <img id="brandImage" alt="Logo Dalle Salgados" />
+        <div class="title">
+          <h2>Sistema Operacional Dalle Salgados</h2>
+          <p>Base profissional para compras, recebimento, produção, estoque e vendas.</p>
+        </div>
+      </div>
+      <div class="pill" id="todayLabel"></div>
+    </div>
 
-  <script>
-    let estoque = JSON.parse(localStorage.getItem("estoque")) || [];
+    <section class="section active" id="dashboardSection">
+      <div class="grid grid-4">
+        <div class="card kpi">
+          <div class="label">Produtos cadastrados</div>
+          <div class="value" id="kpiProdutos">0</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">Itens em atenção / crítico</div>
+          <div class="value" id="kpiBaixo">0</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">Divergências abertas</div>
+          <div class="value" id="kpiDivergencias">0</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">Pedidos aguardando produção</div>
+          <div class="value" id="kpiPedidosProducao">0</div>
+        </div>
+      </div>
 
-    function salvar() {
-      localStorage.setItem("estoque", JSON.stringify(estoque));
+      <div class="grid grid-3" style="margin-top:16px">
+        <div class="card">
+          <h3>🔙 Produção de ontem / Embalar</h3>
+          <div id="embalarOntem" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>📅 Produção do dia</h3>
+          <div id="producaoHoje" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>🚨 Alertas</h3>
+          <div id="alertasGerais" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="vendasSection">
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Novo pedido</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label>Cliente</label>
+              <input id="saleCliente" placeholder="Ex.: Bar do João" />
+            </div>
+            <div class="field">
+              <label>Tipo de cliente</label>
+              <select id="saleTipoCliente">
+                <option>Bar</option>
+                <option>Pessoa Física</option>
+                <option>Buffet Corporativo</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Produto</label>
+              <select id="saleProduto"></select>
+            </div>
+            <div class="field">
+              <label>Tipo de embalagem</label>
+              <select id="saleEmbalagem">
+                <option>6 unidades</option>
+                <option>10 unidades</option>
+                <option>50 unidades</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Quantidade de pacotes</label>
+              <input id="saleQtd" type="number" min="1" value="1" />
+            </div>
+            <div class="field">
+              <label>Data de entrega</label>
+              <input id="saleEntrega" type="date" />
+            </div>
+          </div>
+          <div class="field" style="margin-top:12px">
+            <label>Observações</label>
+            <textarea id="saleObs" placeholder="Anotações do pedido"></textarea>
+          </div>
+          <div class="actions" style="margin-top:12px">
+            <button class="btn orange" onclick="registrarVenda()">Lançar pedido</button>
+          </div>
+          <p class="helper" style="margin-top:10px">Se houver estoque, o sistema dá baixa. Se não houver, envia para produção. Se faltar item base, entra em compras.</p>
+        </div>
+
+        <div class="card">
+          <h3>Pedidos lançados</h3>
+          <div id="salesList" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="producaoSection">
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Planejamento da cozinha</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label>Produto</label>
+              <select id="prodProduto"></select>
+            </div>
+            <div class="field">
+              <label>Data da produção</label>
+              <input id="prodData" type="date" />
+            </div>
+            <div class="field">
+              <label>Quantidade de unidades</label>
+              <input id="prodQtd" type="number" min="1" value="100" />
+            </div>
+            <div class="field">
+              <label>Responsáveis</label>
+              <input id="prodResp" placeholder="Ex.: Rafael e Henrique" />
+            </div>
+            <div class="field">
+              <label>Destino do lote</label>
+              <select id="prodDestino">
+                <option>Frito e vendido</option>
+                <option>Frito e congelado</option>
+                <option>Apenas congelado</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Observação</label>
+              <input id="prodObs" placeholder="Detalhes" />
+            </div>
+          </div>
+          <div class="actions" style="margin-top:12px">
+            <button class="btn" onclick="registrarProducao()">Criar produção / lote</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Controle de recheio pronto</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label>Nome do recheio</label>
+              <input id="fillName" placeholder="Ex.: Frango" />
+            </div>
+            <div class="field">
+              <label>Quantidade (kg)</label>
+              <input id="fillQtd" type="number" min="0" step="0.1" value="1" />
+            </div>
+          </div>
+          <div class="actions" style="margin-top:12px">
+            <button class="btn secondary" onclick="adicionarRecheio()">Adicionar / atualizar recheio</button>
+          </div>
+          <div id="fillingsList" class="list" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-2" style="margin-top:16px">
+        <div class="card">
+          <h3>Lotes criados</h3>
+          <div id="batchesList" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>Painel da cozinha</h3>
+          <div id="kitchenPanel" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="estoqueSection">
+      <div class="card">
+        <h3>Estoque geral</h3>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Categoria</th>
+                <th>Local</th>
+                <th>Qtd.</th>
+                <th>Mínimo</th>
+                <th>Nível</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid grid-3" style="margin-top:16px">
+        <div class="card">
+          <h3>Produtos prontos</h3>
+          <div id="readyStockList" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>Estoque por local</h3>
+          <div id="stockByLocation" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>Divergências</h3>
+          <div id="divergencesList" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="comprasSection">
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Painel de compras</h3>
+          <div id="shoppingSuggestions" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>Lançamento manual de compra</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label>Item</label>
+              <input id="buyItem" placeholder="Ex.: farinha de trigo" />
+            </div>
+            <div class="field">
+              <label>Quantidade</label>
+              <input id="buyQty" type="number" min="1" value="1" />
+            </div>
+          </div>
+          <div class="actions" style="margin-top:12px">
+            <button class="btn" onclick="adicionarCompraManual()">Adicionar em compras</button>
+          </div>
+          <div id="manualShoppingList" class="list" style="margin-top:12px"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="recebimentoSection">
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Registrar recebimento</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label>Produto</label>
+              <select id="recvProduto"></select>
+            </div>
+            <div class="field">
+              <label>Quantidade recebida</label>
+              <input id="recvQtd" type="number" min="0" step="0.1" value="1" />
+            </div>
+            <div class="field">
+              <label>Quantidade conferida</label>
+              <input id="recvConf" type="number" min="0" step="0.1" value="1" />
+            </div>
+            <div class="field">
+              <label>Conferido por</label>
+              <input id="recvBy" placeholder="Ex.: Rafael" />
+            </div>
+            <div class="field">
+              <label>Fornecedor</label>
+              <input id="recvFornecedor" placeholder="Opcional" />
+            </div>
+            <div class="field">
+              <label>Data</label>
+              <input id="recvData" type="date" />
+            </div>
+          </div>
+          <div class="actions" style="margin-top:12px">
+            <button class="btn orange" onclick="registrarRecebimento()">Registrar recebimento</button>
+          </div>
+          <p class="helper" style="margin-top:10px">A entrada acontece antes de guardar no estoque. Se houver diferença entre recebido e conferido, o item entra em azul.</p>
+        </div>
+
+        <div class="card">
+          <h3>Histórico de recebimento</h3>
+          <div id="receiptsList" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="cadastroSection">
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Cadastrar produto base</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label>Nome</label>
+              <input id="cadNome" placeholder="Ex.: Frango desfiado" />
+            </div>
+            <div class="field">
+              <label>Categoria</label>
+              <select id="cadCategoria">
+                <option>Matéria-prima</option>
+                <option>Produto pronto</option>
+                <option>Recheio</option>
+                <option>Empanado</option>
+                <option>Embalagem</option>
+                <option>Limpeza</option>
+                <option>Material de cozinha</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Unidade</label>
+              <select id="cadUnidade">
+                <option>kg</option>
+                <option>g</option>
+                <option>un</option>
+                <option>cx</option>
+                <option>pct</option>
+                <option>L</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Local</label>
+              <select id="cadLocal">
+                <option>Freezer</option>
+                <option>Geladeira</option>
+                <option>Balcão refrigerado</option>
+                <option>Estoque seco</option>
+                <option>Escritório</option>
+                <option>Armário de limpeza</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Quantidade atual</label>
+              <input id="cadQtd" type="number" min="0" step="0.1" value="0" />
+            </div>
+            <div class="field">
+              <label>Estoque mínimo</label>
+              <input id="cadMin" type="number" min="0" step="0.1" value="0" />
+            </div>
+          </div>
+          <div class="actions" style="margin-top:12px">
+            <button class="btn" onclick="cadastrarProduto()">Salvar produto</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Produtos cadastrados</h3>
+          <div id="productsList" class="list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const STORAGE_KEY = "dalle-salgados-pro-v2";
+
+document.getElementById("brandImage").src = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 170'>  <rect width='520' height='170' fill='white'/>  <g transform='translate(15,20)'>    <path d='M25 105V55c0-25 21-45 46-45h34c44 0 80 36 80 80s-36 80-80 80H25z' fill='none' stroke='black' stroke-width='18'/>    <path d='M40 93V58c0-18 15-33 33-33h26c33 0 60 27 60 60s-27 60-60 60H40z' fill='%23f2a000' stroke='none'/>    <text x='190' y='112' font-family='Arial, Helvetica, sans-serif' font-size='100' fill='black'>alle</text>    <text x='65' y='155' font-family='Arial, Helvetica, sans-serif' font-size='28' letter-spacing='18' fill='black'>SALGADOS</text>  </g></svg>`;
+
+const defaultState = {
+  products: [
+    {id:id(), name:"Frango desfiado", category:"Matéria-prima", unit:"kg", quantity:20, minStock:8, location:"Freezer"},
+    {id:id(), name:"Farinha de trigo", category:"Matéria-prima", unit:"kg", quantity:40, minStock:15, location:"Estoque seco"},
+    {id:id(), name:"Leite", category:"Matéria-prima", unit:"L", quantity:8, minStock:4, location:"Geladeira"},
+    {id:id(), name:"Caixa 10 unidades", category:"Embalagem", unit:"un", quantity:200, minStock:80, location:"Escritório"},
+    {id:id(), name:"Pacote 50 unidades", category:"Embalagem", unit:"un", quantity:100, minStock:30, location:"Escritório"},
+    {id:id(), name:"Detergente", category:"Limpeza", unit:"un", quantity:10, minStock:4, location:"Armário de limpeza"},
+    {id:id(), name:"Coxinha 10 unidades", category:"Produto pronto", unit:"pct", quantity:35, minStock:12, location:"Freezer"},
+    {id:id(), name:"Coxinha 6 unidades", category:"Produto pronto", unit:"pct", quantity:16, minStock:8, location:"Freezer"},
+    {id:id(), name:"Mini salgado 50 unidades", category:"Produto pronto", unit:"pct", quantity:8, minStock:5, location:"Freezer"}
+  ],
+  receipts: [],
+  sales: [],
+  purchases: [],
+  productions: [],
+  batches: [],
+  fillings: [
+    {id:id(), name:"Frango", qty:4.5},
+    {id:id(), name:"Carne", qty:1.2}
+  ]
+};
+
+let state = loadState();
+
+function id() {
+  return "id-" + Math.random().toString(36).slice(2,9);
+}
+
+function batchCode(productName){
+  const d = new Date();
+  const dd = String(d.getDate()).padStart(2,"0");
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const seq = (state.batches.length + 1).toString().padStart(2,"0");
+  return productName.slice(0,2).toUpperCase() + "-" + dd + mm + "-" + seq;
+}
+
+function loadState(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return structuredClone(defaultState);
+  try { return JSON.parse(raw); } catch(e) { return structuredClone(defaultState); }
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function setTodayDefaults(){
+  const today = new Date().toISOString().slice(0,10);
+  ["saleEntrega","prodData","recvData"].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = today;
+  });
+  document.getElementById("todayLabel").textContent = new Date().toLocaleDateString("pt-BR", { weekday:"long", day:"2-digit", month:"long", year:"numeric" });
+}
+
+function getStockLevel(item){
+  const q = Number(item.quantity || 0);
+  const min = Number(item.minStock || 0);
+  if (item.divergent) return {label:"Divergência", badge:"b-blue", row:"row-blue"};
+  if (q <= min) return {label:"Crítico", badge:"b-red", row:"row-red"};
+  if (q <= min * 2) return {label:"Atenção", badge:"b-yellow", row:"row-yellow"};
+  return {label:"OK", badge:"b-green", row:"row-green"};
+}
+
+function qs(id){ return document.getElementById(id); }
+
+function populateSelectors(){
+  const productNames = state.products.filter(p => p.category === "Produto pronto").map(p => p.name);
+  const allProducts = state.products.map(p => p.name);
+
+  fillSelect("saleProduto", productNames.length ? productNames : ["Sem produto pronto cadastrado"]);
+  fillSelect("prodProduto", productNames.length ? productNames : ["Sem produto pronto cadastrado"]);
+  fillSelect("recvProduto", allProducts.length ? allProducts : ["Sem produto cadastrado"]);
+}
+
+function fillSelect(id, values){
+  const select = qs(id);
+  select.innerHTML = values.map(v => `<option>${v}</option>`).join("");
+}
+
+function render(){
+  saveState();
+  populateSelectors();
+  renderDashboard();
+  renderInventory();
+  renderSales();
+  renderProductions();
+  renderPurchases();
+  renderReceipts();
+  renderProducts();
+  renderFillings();
+}
+
+function renderDashboard(){
+  qs("kpiProdutos").textContent = state.products.length;
+  qs("kpiBaixo").textContent = state.products.filter(p => {
+    const q = Number(p.quantity||0), min = Number(p.minStock||0);
+    return q <= min * 2;
+  }).length;
+  qs("kpiDivergencias").textContent = state.receipts.filter(r => r.status === "Divergente").length;
+  qs("kpiPedidosProducao").textContent = state.sales.filter(s => s.status === "Enviar produção").length;
+
+  const ontem = state.productions.slice(-4).map(p => listItem(`${p.product}`, `${p.quantity} un • embalar/acompanhar`, "b-gray")).join("") || empty("Sem pendência registrada.");
+  qs("embalarOntem").innerHTML = ontem;
+
+  const hoje = state.sales.filter(s => s.status !== "Atendido pelo estoque").slice(-6).map(s =>
+    listItem(`${s.product}`, `${s.packages} pacote(s) • entrega ${fmtDate(s.deliveryDate)}`, s.status === "Aguardando compras" ? "b-red" : "b-yellow")
+  ).join("") || empty("Nenhuma produção urgente no momento.");
+  qs("producaoHoje").innerHTML = hoje;
+
+  const alerts = [];
+  state.products.forEach(p => {
+    const lvl = getStockLevel(p);
+    if (lvl.label !== "OK") alerts.push(listItem(p.name, `${lvl.label} • ${p.quantity} ${p.unit}`, lvl.badge));
+  });
+  state.receipts.filter(r => r.status === "Divergente").forEach(r => {
+    alerts.push(listItem(`Divergência: ${r.product}`, `Recebido ${r.received} / Conferido ${r.checked}`, "b-blue"));
+  });
+  qs("alertasGerais").innerHTML = alerts.join("") || empty("Tudo sob controle.");
+}
+
+function renderInventory(){
+  const tbody = qs("inventoryTable");
+  tbody.innerHTML = state.products.map(p => {
+    const lvl = getStockLevel(p);
+    return `
+      <tr class="${lvl.row}">
+        <td><strong>${p.name}</strong></td>
+        <td>${p.category}</td>
+        <td>${p.location}</td>
+        <td>${p.quantity} ${p.unit}</td>
+        <td>${p.minStock} ${p.unit}</td>
+        <td><span class="badge ${lvl.badge}">${lvl.label}</span></td>
+      </tr>
+    `;
+  }).join("");
+
+  const ready = state.products.filter(p => p.category === "Produto pronto");
+  qs("readyStockList").innerHTML = ready.map(p => {
+    const lvl = getStockLevel(p);
+    return listItem(p.name, `${p.quantity} ${p.unit}`, lvl.badge);
+  }).join("") || empty("Sem produtos prontos.");
+
+  const byLoc = {};
+  state.products.forEach(p => {
+    byLoc[p.location] = (byLoc[p.location] || 0) + 1;
+  });
+  qs("stockByLocation").innerHTML = Object.entries(byLoc).map(([loc, count]) => listItem(loc, `${count} item(ns)`, "b-gray")).join("") || empty("Sem itens.");
+
+  const divergences = state.receipts.filter(r => r.status === "Divergente");
+  qs("divergencesList").innerHTML = divergences.map(r => listItem(r.product, `Recebido ${r.received} / Conferido ${r.checked}`, "b-blue")).join("") || empty("Nenhuma divergência.");
+}
+
+function renderSales(){
+  qs("salesList").innerHTML = state.sales.slice().reverse().map(s => {
+    const badge = s.status === "Atendido pelo estoque" ? "b-green" : s.status === "Enviar produção" ? "b-yellow" : "b-red";
+    return `
+      <div class="list-item">
+        <div class="list-head">
+          <div>
+            <strong>${s.client}</strong>
+            <div class="muted">${s.product} • ${s.packageType} • ${s.packages} pacote(s)</div>
+            <div class="muted">Entrega: ${fmtDate(s.deliveryDate)}</div>
+          </div>
+          <span class="badge ${badge}">${s.status}</span>
+        </div>
+      </div>
+    `;
+  }).join("") || empty("Nenhum pedido lançado.");
+}
+
+function renderProductions(){
+  qs("batchesList").innerHTML = state.batches.slice().reverse().map(b => `
+    <div class="list-item">
+      <div class="list-head">
+        <div>
+          <strong>${b.code}</strong>
+          <div class="muted">${b.product} • ${b.quantity} un</div>
+          <div class="muted">${fmtDate(b.date)} • ${b.destination}</div>
+        </div>
+        <span class="badge b-gray">${b.responsible || "Sem responsável"}</span>
+      </div>
+    </div>
+  `).join("") || empty("Nenhum lote criado.");
+
+  const kitchenItems = [];
+  state.sales.filter(s => s.status === "Enviar produção" || s.status === "Aguardando compras").forEach(s => {
+    kitchenItems.push(listItem(s.product, `${s.packages} pacote(s) • entregar ${fmtDate(s.deliveryDate)}`, s.status === "Aguardando compras" ? "b-red" : "b-yellow"));
+  });
+  state.batches.slice(-4).forEach(b => {
+    kitchenItems.push(listItem(`Lote ${b.code}`, `${b.product} • ${b.destination}`, "b-gray"));
+  });
+  qs("kitchenPanel").innerHTML = kitchenItems.join("") || empty("Sem alerta de cozinha.");
+
+  renderFillings();
+}
+
+function renderPurchases(){
+  const suggestions = [];
+
+  state.products.forEach(p => {
+    const lvl = getStockLevel(p);
+    if (lvl.label === "Crítico" || lvl.label === "Atenção") {
+      suggestions.push(listItem(p.name, `Atual: ${p.quantity} ${p.unit} • mínimo ${p.minStock}`, lvl.badge));
     }
+  });
 
-    function render() {
-      let lista = document.getElementById("lista");
-      lista.innerHTML = "";
-      estoque.forEach((item, index) => {
-        let li = document.createElement("li");
-        li.innerHTML = item.produto + " - " + item.quantidade + 
-        " <button onclick='remover(" + index + ")'>Vender</button>";
-        lista.appendChild(li);
-      });
+  state.sales.filter(s => s.status === "Aguardando compras").forEach(s => {
+    suggestions.push(listItem(`Pedido sem base: ${s.product}`, `${s.packages} pacote(s) • cliente ${s.client}`, "b-red"));
+  });
+
+  qs("shoppingSuggestions").innerHTML = suggestions.join("") || empty("Sem necessidade imediata de compra.");
+
+  qs("manualShoppingList").innerHTML = state.purchases.slice().reverse().map(p => listItem(p.item, `${p.qty} unidade(s)`, "b-gray")).join("") || empty("Nenhuma compra manual lançada.");
+}
+
+function renderReceipts(){
+  qs("receiptsList").innerHTML = state.receipts.slice().reverse().map(r => {
+    const badge = r.status === "Divergente" ? "b-blue" : "b-green";
+    return `
+      <div class="list-item">
+        <div class="list-head">
+          <div>
+            <strong>${r.product}</strong>
+            <div class="muted">Recebido ${r.received} / Conferido ${r.checked}</div>
+            <div class="muted">${fmtDate(r.date)} • ${r.checkedBy || "Sem nome"}</div>
+          </div>
+          <span class="badge ${badge}">${r.status}</span>
+        </div>
+      </div>
+    `;
+  }).join("") || empty("Nenhum recebimento registrado.");
+}
+
+function renderProducts(){
+  qs("productsList").innerHTML = state.products.slice().reverse().map(p => {
+    const lvl = getStockLevel(p);
+    return `
+      <div class="list-item">
+        <div class="list-head">
+          <div>
+            <strong>${p.name}</strong>
+            <div class="muted">${p.category} • ${p.location}</div>
+            <div class="muted">${p.quantity} ${p.unit} • mínimo ${p.minStock}</div>
+          </div>
+          <span class="badge ${lvl.badge}">${lvl.label}</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderFillings(){
+  qs("fillingsList").innerHTML = state.fillings.slice().reverse().map(f => listItem(f.name, `${f.qty} kg`, "b-gray")).join("") || empty("Sem recheio registrado.");
+}
+
+function listItem(title, text, badgeClass){
+  return `
+    <div class="list-item">
+      <div class="list-head">
+        <div>
+          <strong>${title}</strong>
+          <div class="muted">${text}</div>
+        </div>
+        <span class="badge ${badgeClass}">${badgeLabel(badgeClass)}</span>
+      </div>
+    </div>
+  `;
+}
+
+function badgeLabel(c){
+  return c === "b-green" ? "OK" :
+         c === "b-yellow" ? "Atenção" :
+         c === "b-red" ? "Crítico" :
+         c === "b-blue" ? "Erro" : "Info";
+}
+
+function empty(text){
+  return `<div class="list-item"><div class="muted">${text}</div></div>`;
+}
+
+function fmtDate(d){
+  if(!d) return "sem data";
+  const [y,m,day] = d.split("-");
+  return `${day}/${m}/${y}`;
+}
+
+function cadastrarProduto(){
+  const p = {
+    id:id(),
+    name:qs("cadNome").value.trim(),
+    category:qs("cadCategoria").value,
+    unit:qs("cadUnidade").value,
+    location:qs("cadLocal").value,
+    quantity:Number(qs("cadQtd").value || 0),
+    minStock:Number(qs("cadMin").value || 0)
+  };
+  if(!p.name) return alert("Digite o nome do produto.");
+  state.products.push(p);
+  ["cadNome","cadQtd","cadMin"].forEach(k => qs(k).value = k === "cadNome" ? "" : 0);
+  render();
+}
+
+function registrarRecebimento(){
+  const name = qs("recvProduto").value;
+  const received = Number(qs("recvQtd").value || 0);
+  const checked = Number(qs("recvConf").value || 0);
+  if(!name) return alert("Escolha o produto.");
+  const product = state.products.find(p => p.name === name);
+  if(!product) return alert("Produto não encontrado.");
+  product.quantity = Number(product.quantity || 0) + checked;
+  const status = received === checked ? "Conferido" : "Divergente";
+  state.receipts.push({
+    id:id(),
+    product:name,
+    received,
+    checked,
+    checkedBy:qs("recvBy").value.trim(),
+    supplier:qs("recvFornecedor").value.trim(),
+    date:qs("recvData").value,
+    status
+  });
+  render();
+}
+
+function adicionarCompraManual(){
+  const item = qs("buyItem").value.trim();
+  const qty = Number(qs("buyQty").value || 0);
+  if(!item) return alert("Digite o item.");
+  state.purchases.push({id:id(), item, qty});
+  qs("buyItem").value = "";
+  qs("buyQty").value = 1;
+  render();
+}
+
+function adicionarRecheio(){
+  const name = qs("fillName").value.trim();
+  const qty = Number(qs("fillQtd").value || 0);
+  if(!name) return alert("Digite o recheio.");
+  const existing = state.fillings.find(f => f.name.toLowerCase() === name.toLowerCase());
+  if(existing) existing.qty += qty;
+  else state.fillings.push({id:id(), name, qty});
+  qs("fillName").value = "";
+  qs("fillQtd").value = 1;
+  render();
+}
+
+function registrarProducao(){
+  const product = qs("prodProduto").value;
+  const quantity = Number(qs("prodQtd").value || 0);
+  if(!product || !quantity) return alert("Preencha produto e quantidade.");
+  const batch = {
+    id:id(),
+    code: batchCode(product),
+    product,
+    quantity,
+    date: qs("prodData").value,
+    responsible: qs("prodResp").value.trim(),
+    destination: qs("prodDestino").value,
+    notes: qs("prodObs").value.trim()
+  };
+  state.productions.push({
+    id:id(),
+    product,
+    quantity,
+    date: qs("prodData").value,
+    responsible: qs("prodResp").value.trim()
+  });
+  state.batches.push(batch);
+
+  const readyProduct = state.products.find(p => p.name === product && p.category === "Produto pronto");
+  if(readyProduct && batch.destination !== "Frito e vendido"){
+    readyProduct.quantity = Number(readyProduct.quantity || 0) + Math.ceil(quantity / 10);
+  }
+
+  const fillingName = product.toLowerCase().includes("coxinha") ? "Frango" : null;
+  if(fillingName){
+    const fill = state.fillings.find(f => f.name.toLowerCase() === fillingName.toLowerCase());
+    if(fill){
+      fill.qty = Math.max(0, Number(fill.qty) - (quantity * 0.012));
     }
+  }
 
-    function adicionar() {
-      let produto = document.getElementById("produto").value;
-      let quantidade = document.getElementById("quantidade").value;
+  ["prodQtd","prodResp","prodObs"].forEach(k => qs(k).value = k === "prodQtd" ? 100 : "");
+  render();
+}
 
-      estoque.push({ produto, quantidade });
-      salvar();
-      render();
-    }
+function registrarVenda(){
+  const client = qs("saleCliente").value.trim();
+  const productName = qs("saleProduto").value;
+  const packageType = qs("saleEmbalagem").value;
+  const packages = Number(qs("saleQtd").value || 0);
+  const deliveryDate = qs("saleEntrega").value;
+  if(!client || !productName || !packages) return alert("Preencha cliente, produto e quantidade.");
 
-    function remover(index) {
-      estoque.splice(index, 1);
-      salvar();
-      render();
-    }
+  const product = state.products.find(p => p.name === productName);
+  if(!product) return alert("Produto não encontrado.");
 
-    render();
-  </script>
+  let status = "Atendido pelo estoque";
+  if(Number(product.quantity || 0) >= packages){
+    product.quantity = Number(product.quantity || 0) - packages;
+  } else {
+    status = "Enviar produção";
+    const baseLow = state.products.some(p => (p.category === "Matéria-prima" || p.category === "Embalagem") && Number(p.quantity || 0) <= Number(p.minStock || 0));
+    if(baseLow) status = "Aguardando compras";
+  }
 
+  state.sales.push({
+    id:id(),
+    client,
+    customerType: qs("saleTipoCliente").value,
+    product: productName,
+    packageType,
+    packages,
+    deliveryDate,
+    notes: qs("saleObs").value.trim(),
+    status
+  });
+
+  ["saleCliente","saleObs"].forEach(k => qs(k).value = "");
+  qs("saleQtd").value = 1;
+  render();
+}
+
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    document.getElementById(btn.dataset.section + "Section").classList.add("active");
+  });
+});
+
+setTodayDefaults();
+render();
+</script>
 </body>
 </html>
